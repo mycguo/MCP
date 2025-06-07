@@ -90,9 +90,9 @@ Forecast: {period['detailedForecast']}
 
     return "\n---\n".join(forecasts)
 
-@mcp.chat()
+@mcp.tool(name="chat")
 async def handle_chat(message: str) -> str:
-    """Answer arbitrary questions using a language model."""
+    """Respond to a free-form chat message using a language model."""
     try:
         llm = ChatGroq(model=os.getenv("GROQ_MODEL", "qwen-qwq-32b"))
         response = await llm.ainvoke(message)
