@@ -59,3 +59,23 @@ async def get_alerts(state: str) -> str:
 def echo_resource(message: str) -> str:
     """Echo a message as a resource"""
     return f"Resource echo: {message}"
+
+@mcp.chat()
+async def handle_chat(message: str) -> str:
+    """Handle general chat requests not covered by specific tools."""
+    lower = message.lower()
+    if "hello" in lower or "hi" in lower:
+        return (
+            "Hello! I can look up National Weather Service forecasts and alerts "
+            "for you. Try asking for a forecast or any active alerts."
+        )
+    if "help" in lower:
+        return (
+            "Use the get_forecast tool with latitude and longitude or "
+            "get_alerts with a US state code to see current advisories."
+        )
+    return (
+        "I'm a weather assistant. Ask me about forecasts or alerts for a "
+        "specific location."
+    )
+
