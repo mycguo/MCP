@@ -1,5 +1,7 @@
 from typing import Any
+import os
 import httpx
+from langchain_groq import ChatGroq
 from mcp.server.fastmcp import FastMCP
 
 # Initialize FastMCP server
@@ -62,20 +64,12 @@ def echo_resource(message: str) -> str:
 
 @mcp.chat()
 async def handle_chat(message: str) -> str:
-    """Handle general chat requests not covered by specific tools."""
-    lower = message.lower()
-    if "hello" in lower or "hi" in lower:
-        return (
-            "Hello! I can look up National Weather Service forecasts and alerts "
-            "for you. Try asking for a forecast or any active alerts."
-        )
-    if "help" in lower:
-        return (
-            "Use the get_forecast tool with latitude and longitude or "
-            "get_alerts with a US state code to see current advisories."
-        )
-    return (
-        "I'm a weather assistant. Ask me about forecasts or alerts for a "
-        "specific location."
-    )
+    """Answer arbitrary questions using a language model."""
+    try:
+        llm = ChatGroq(model=os.getenv("GROQ_MODEL", "qwen-qwq-32b"))
+        response = await llm.ainvoke(message)
+        content = getattr(response, "content", None)
+        return content if content else str(response)
+    except Exception:
+        return "Sorry, I couldn't process that question right now."
 
