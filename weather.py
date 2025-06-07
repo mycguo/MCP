@@ -1,5 +1,7 @@
 from typing import Any
+import os
 import httpx
+from langchain_groq import ChatGroq
 from mcp.server.fastmcp import FastMCP
 
 # Initialize FastMCP server
@@ -87,6 +89,17 @@ Forecast: {period['detailedForecast']}
         forecasts.append(forecast)
 
     return "\n---\n".join(forecasts)
+
+@mcp.chat()
+async def handle_chat(message: str) -> str:
+    """Answer arbitrary questions using a language model."""
+    try:
+        llm = ChatGroq(model=os.getenv("GROQ_MODEL", "qwen-qwq-32b"))
+        response = await llm.ainvoke(message)
+        content = getattr(response, "content", None)
+        return content if content else str(response)
+    except Exception:
+        return "Sorry, I couldn't process that question right now."
 
 if __name__ == "__main__":
     # Initialize and run the server
